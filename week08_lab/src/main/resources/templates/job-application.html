@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application - World Jobs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+            <a class="navbar-brand fs-3 fw-bold text-primary" href="/">World Jobs</a>
+        </div>
+    </nav>
+</header>
+
+<main class="container py-5">
+    <h1 class="mb-4">Job Application</h1>
+    <form th:action="@{/jobs/{jobId}/apply(jobId=${jobId})}" method="post" class="needs-validation" th:object="${candidate}" id="registrationForm">
+        <input type="hidden" name="jobId" th:value="${jobId}" />
+        <input type="hidden" th:field="*{userId}" />
+        <input type="hidden" th:field="*{id}" />
+
+        <!-- Personal Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="card-title h5 mb-0">Personal Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="fullName" th:field="*{fullName}" required>
+                        <div class="invalid-feedback">Please provide your full name.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                        <div class="invalid-feedback">Please provide a valid email.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="phone" th:field="*{phone}" required>
+                        <div class="invalid-feedback">Please provide a valid phone number.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="dob" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="dob" th:field="*{dob}" required>
+                        <div class="invalid-feedback">Please provide your date of birth.</div>
+                    </div>
+                    <input type="hidden" th:field="*{address.id}" />
+                    <div class="col-md-6">
+                        <label for="country" class="form-label">Country</label>
+                        <select class="form-select" id="country" th:field="*{address.country}" required>
+                            <option value="">Choose a country</option>
+                            <option th:each="country : ${countries}"
+                                    th:value="${country['code']}"
+                                    th:text="${country['name']}"></option>
+                        </select>
+                        <div class="invalid-feedback">Please select a country.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" th:field="*{address.city}" placeholder="Ho Chi Minh" required>
+                        <div class="invalid-feedback">Please provide a city.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="street" class="form-label">Street</label>
+                        <input type="text" class="form-control" id="street" th:field="*{address.street}" placeholder="Le Duc Tho" required>
+                        <div class="invalid-feedback">Please provide a street name.</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="number" class="form-label">House Number</label>
+                        <input type="text" class="form-control" id="number" th:field="*{address.number}" placeholder="123" required>
+                        <div class="invalid-feedback">Please provide a house number.</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="zip" class="form-label">Zip Code</label>
+                        <input type="text" class="form-control" id="zip" th:field="*{address.zipcode}" placeholder="700000" required>
+                        <div class="invalid-feedback">Please provide a zip code.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="card-title h5 mb-0">Skills</h2>
+            </div>
+            <div class="card-body">
+                <div id="skillsContainer">
+                    <!-- Kiểm tra nếu candidateSkills có dữ liệu -->
+                    <div th:each="candidateSkill, iterStat : ${candidate.candidateSkills}">
+                        <input type="hidden" th:field="*{candidateSkills[__${iterStat.index}__].id.candidateId}" />
+                        <input type="hidden" th:field="*{candidateSkills[__${iterStat.index}__].id.skillId}" />
+                        <div class="row g-3 mb-3">
+                            <input type="hidden" th:field="*{candidateSkills[__${iterStat.index}__].skill.id}" />
+                            <div class="col-md-4">
+                                <label for="skillName" class="form-label">Skill Name</label>
+                                <input type="text" class="form-control" id="skillName"
+                                       th:field="*{candidateSkills[__${iterStat.index}__].skill.skillName}"
+                                       required>
+                                <div class="invalid-feedback">Please provide a skill name.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="skillLevel" class="form-label">Skill Level</label>
+                                <select class="form-select" id="skillLevel"
+                                        th:field="*{candidateSkills[__${iterStat.index}__].skillLevel}">
+                                    <option value="">Choose...</option>
+                                    <option value="BEGINNER">Beginner</option>
+                                    <option value="INTERMEDIATE">Intermediate</option>
+                                    <option value="ADVANCED">Advanced</option>
+                                    <option value="PROFESSIONAL">Professional</option>
+                                    <option value="MASTER">Master</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a skill level.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="skillType" class="form-label">Skill Type</label>
+                                <select class="form-select" id="skillType"
+                                        th:field="*{candidateSkills[__${iterStat.index}__].skill.type}" required>
+                                    <option value="">Choose...</option>
+                                    <option value="SOFT_SKILL">Soft Skill</option>
+                                    <option value="TECHNICAL_SKILL">Technical Skill</option>
+                                    <option value="UNSPECIFIED">Unspecified</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a skill type.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(candidate.candidateSkills)}">
+                        <div class="row g-3 mb-3 skill-entry">
+                        <div class="col-md-4">
+                            <label for="skillName0" class="form-label">Skill Name</label>
+                            <input type="text" class="form-control" id="skillName0" name="candidateSkills[0].skill.skillName" required>
+                            <div class="invalid-feedback">Please provide a skill name.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="skillLevel0" class="form-label">Skill Level</label>
+                            <select class="form-select" id="skillLevel0" name="candidateSkills[0].skillLevel" required>
+                                <option value="">Choose...</option>
+                                <option value="BEGINNER">Beginner</option>
+                                <option value="INTERMEDIATE">Intermediate</option>
+                                <option value="ADVANCED">Advanced</option>
+                                <option value="PROFESSIONAL">Professional</option>
+                                <option value="MASTER">Master</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a skill level.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="skillType0" class="form-label">Skill Type</label>
+                            <select class="form-select" id="skillType0" name="candidateSkills[0].skill.type" required>
+                                <option value="">Choose...</option>
+                                <option value="SOFT_SKILL">Soft Skill</option>
+                                <option value="TECHNICAL_SKILL">Technical Skill</option>
+                                <option value="UNSPECIFIED">Unspecified</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a skill type.</div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" id="addSkill">Add Another Skill</button>
+            </div>
+        </div>
+
+        <!-- Work Experience -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="card-title h5 mb-0">Work Experience</h2>
+            </div>
+            <div class="card-body">
+                <div id="experienceContainer">
+                    <!-- Kiểm tra nếu experiences có dữ liệu -->
+                    <div th:each="experience, iterStat : ${candidate.experiences}">
+                        <div class="row g-3 mb-3">
+                            <input type="hidden" th:field="*{experiences[__${iterStat.index}__].id}" />
+                            <div class="col-md-6">
+                                <label th:for="|companyName${iterStat.index}|"
+                                       class="form-label">Company Name</label>
+                                <input type="text" class="form-control" th:id="|companyName${iterStat.index}|"
+                                       th:field="*{experiences[__${iterStat.index}__].companyName}" required>
+                                <div class="invalid-feedback">Please provide a company name.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label th:for="|role${iterStat.index}|"
+                                       class="form-label">Role</label>
+                                <input type="text" class="form-control" th:id="|role${iterStat.index}|"
+                                       th:field="*{experiences[__${iterStat.index}__].role}" required>
+                                <div class="invalid-feedback">Please provide your role.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label th:for="|fromDate${iterStat.index}|"
+                                       class="form-label">From Date</label>
+                                <input type="date" class="form-control" th:id="|fromDate${iterStat.index}|"
+                                       th:field="*{experiences[__${iterStat.index}__].fromDate}" required>
+                                <div class="invalid-feedback">Please provide a start date.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label th:for="|toDate${iterStat.index}|"
+                                       class="form-label">To Date</label>
+                                <input type="date" class="form-control" th:id="|toDate${iterStat.index}|"
+                                       th:field="*{experiences[__${iterStat.index}__].toDate}">
+                                <div class="invalid-feedback">Leave blank if this is your current job.</div>
+                            </div>
+                            <div class="col-12">
+                                <label th:for="|workDescription${iterStat.index}|"
+                                       class="form-label">Work Description</label>
+                                <textarea class="form-control" th:id="|workDescription${iterStat.index}|"
+                                            th:field="*{experiences[__${iterStat.index}__].workDescription}" rows="3" required></textarea>
+                                <div class="invalid-feedback">Please provide a work description.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(candidate.experiences)}">
+                        <div class="row g-3 mb-3 experience-entry">
+                        <div class="col-md-6">
+                            <label for="companyName0" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="companyName0" name="experiences[0].companyName" required>
+                            <div class="invalid-feedback">Please provide a company name.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="role0" class="form-label">Role</label>
+                            <input type="text" class="form-control" id="role0" name="experiences[0].role" required>
+                            <div class="invalid-feedback">Please provide your role.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fromDate0" class="form-label">From Date</label>
+                            <input type="date" class="form-control" id="fromDate0" name="experiences[0].fromDate" required>
+                            <div class="invalid-feedback">Please provide a start date.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="toDate0" class="form-label">To Date</label>
+                            <input type="date" class="form-control" id="toDate0" name="experiences[0].toDate">
+                            <div class="invalid-feedback">Leave blank if this is your current job.</div>
+                        </div>
+                        <div class="col-12">
+                            <label for="workDescription0" class="form-label">Work Description</label>
+                            <textarea class="form-control" id="workDescription0" name="experiences[0].workDescription" rows="3" required></textarea>
+                            <div class="invalid-feedback">Please provide a work description.</div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" id="addExperience">Add Another Experience</button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">Submit Application</button>
+    </form>
+</main>
+
+<footer class="bg-light mt-5 py-3">
+    <div class="container text-center">
+        <p>&copy; 2023 World Jobs. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Form validation
+    const form = document.getElementById("registrationForm");
+
+    // form.querySelectorAll("input, select, textarea, option").forEach(field => {
+    //     field.addEventListener("blur", checkInput);
+    // });
+
+    form.addEventListener("blur", checkInput, true);
+
+    function checkInput(event) {
+        const field = event.target;
+        const errorMessage = field.nextElementSibling;
+
+        if (field.tagName === "SELECT") {
+            if (field.value === "") {
+                errorMessage.style.display = "block";
+            } else {
+                errorMessage.style.display = "none";
+            }
+        } else {
+            if (field.value.trim() === "") {
+                errorMessage.style.display = "block";
+            } else {
+                errorMessage.style.display = "none";
+            }
+        }
+
+    }
+
+    // Add skill
+    const skillsContainer = document.getElementById("skillsContainer");
+    let skillCount = skillsContainer.children.length > 0 ? skillsContainer.children.length : 1;
+    document.getElementById('addSkill').addEventListener('click', function() {
+        const skillsContainer = document.getElementById('skillsContainer');
+        const newSkill = document.createElement('div');
+        newSkill.className = 'row g-3 mb-3 skill-entry';
+        newSkill.innerHTML = `
+                <div class="col-md-4">
+                    <label for="skillName${skillCount}" class="form-label">Skill Name</label>
+                    <input type="text" class="form-control" id="skillName${skillCount}" name="candidateSkills[${skillCount}].skill.skillName" required>
+                    <div class="invalid-feedback">Please provide a skill name.</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="skillLevel${skillCount}" class="form-label">Skill Level</label>
+                    <select class="form-select" id="skillLevel${skillCount}" name="candidateSkills[${skillCount}].skillLevel" required>
+                        <option value="">Choose...</option>
+                        <option value="BEGINNER">Beginner</option>
+                        <option value="INTERMEDIATE">Intermediate</option>
+                        <option value="ADVANCED">Advanced</option>
+                        <option value="PROFESSIONAL">Professional</option>
+                        <option value="MASTER">Master</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a skill level.</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="skillType${skillCount}" class="form-label">Skill Type</label>
+                    <select class="form-select" id="skillType${skillCount}" name="candidateSkills[${skillCount}].skill.type" required>
+                        <option value="">Choose...</option>
+                        <option value="SOFT_SKILL">Soft Skill</option>
+                        <option value="TECHNICAL_SKILL">Technical Skill</option>
+                        <option value="UNSPECIFIED">Unspecified</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a skill type.</div>
+                </div>
+            `;
+        skillsContainer.appendChild(newSkill);
+        skillCount++;
+    });
+
+    // Add experience
+    const experienceContainer = document.getElementById('experienceContainer');
+    let experienceCount = experienceContainer.children.length > 0 ? experienceContainer.children.length : 1;
+    document.getElementById('addExperience').addEventListener('click', function() {
+        const experienceContainer = document.getElementById('experienceContainer');
+        const newExperience = document.createElement('div');
+        newExperience.className = 'row g-3 mb-3 experience-entry';
+        newExperience.innerHTML = `
+                <div class="col-md-6">
+                    <label for="companyName${experienceCount}" class="form-label">Company Name</label>
+                    <input type="text" class="form-control" id="companyName${experienceCount}" name="experiences[${experienceCount}].companyName" required>
+                    <div class="invalid-feedback">Please provide a company name.</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="role${experienceCount}" class="form-label">Role</label>
+                    <input type="text" class="form-control" id="role${experienceCount}" name="experiences[${experienceCount}].role" required>
+                    <div class="invalid-feedback">Please provide your role.</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="fromDate${experienceCount}" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="fromDate${experienceCount}" name="experiences[${experienceCount}].fromDate" required>
+                    <div class="invalid-feedback">Please provide a start date.</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="toDate${experienceCount}" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="toDate${experienceCount}" name="experiences[${experienceCount}].toDate">
+                    <div class="form-text">Leave blank if this is your current job.</div>
+                </div>
+                <div class="col-12">
+                    <label for="workDescription${experienceCount}" class="form-label">Work Description</label>
+                    <textarea class="form-control" id="workDescription${experienceCount}" name="experiences[${experienceCount}].workDescription" rows="3" required></textarea>
+                    <div class="invalid-feedback">Please provide a work description.</div>
+                </div>
+            `;
+        experienceContainer.appendChild(newExperience);
+        experienceCount++;
+    });
+</script>
+</body>
+</html>
