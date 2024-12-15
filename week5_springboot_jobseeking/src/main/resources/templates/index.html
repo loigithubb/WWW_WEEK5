@@ -18,7 +18,7 @@
 
 
         .navbar-custom {
-            background-color: white;
+            background-color: red;
             border-bottom: 1px solid #ddd;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
@@ -30,7 +30,7 @@
         }
 
         .nav-item:hover{
-            background-color: #17a2b8;
+            background-color: red;
         }
         .nav-link:hover {
             color: #FFFFFF; /* Blue hover color */
@@ -41,7 +41,7 @@
         }
         /* Banner section */
         .banner {
-            background-color: #f8c7b6;
+            background-color: red;
             padding: 50px 0;
             text-align: center;
             color: #333;
@@ -74,6 +74,9 @@
             object-fit: cover;
         }
 
+        .posi{
+            width:254px; height: 184px
+        }
         .card-title {
             font-weight: bold;
             font-size: 1.2rem;
@@ -94,7 +97,7 @@
         }
 
         .card-body:hover {
-            background-color: #44e3ff;
+            background-color: red;
 
         }
 
@@ -254,8 +257,8 @@
     <div class="row g-4">
         <!-- Card 1 -->
         <div th:each="job : ${jobPage.content}" class="col-md-3">
-            <div class="card">
-                <img src="https://viettel-hanoi.vn/wp-content/uploads/2021/07/cropped-logored.png.webp" class="card-img-top" alt="Event 1">
+            <div class="card1">
+                <img src="https://viettel-hanoi.vn/wp-content/uploads/2021/07/cropped-logored.png.webp" class="posi" alt="Event 1">
                 <div class="card-body">
 
                     <h6 class="card-title" th:text="${job.jobName}"></h6>
